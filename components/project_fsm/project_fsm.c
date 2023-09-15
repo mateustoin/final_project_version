@@ -56,7 +56,7 @@ void runFsm()
     setSystemEvent(Card_Insert_Event);
     while(true) {
         //Read system Events
-        eSystemEvent eNewEvent = ReadEvent();
+        eNewEvent = ReadEvent();
         switch(eNextState) {
         case Idle_State:
             ESP_LOGI(TAG, "Entering Idle_State");

@@ -28,11 +28,12 @@ static void button_single_click_cb()
 
 void init_gpio_button_config()
 {
+    ESP_LOGI(TAG, "Initializing button callback configuration...");
     // Configura botão do M5
     button_handle_t gpio_btn = iot_button_create(&gpio_btn_cfg);
     if(NULL == gpio_btn) {
         ESP_LOGE("Button_A", "Button create failed");
     }
-    ESP_LOGE("Button_A", "Button create success");
+    ESP_LOGI("Button_A", "Button create success");
     iot_button_register_cb(gpio_btn, BUTTON_SINGLE_CLICK, &button_single_click_cb, NULL);
 }
