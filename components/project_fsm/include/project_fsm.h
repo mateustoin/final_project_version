@@ -41,6 +41,7 @@ eSystemState EnterPinHandler();
 eSystemState InsertCardHandler();
 
 void runFsm();
+void runProjectFsm();
 
 eSystemEvent ReadEvent();
 

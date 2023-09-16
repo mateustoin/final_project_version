@@ -1,4 +1,4 @@
-menu "WiFi Config"
+menu "Project WiFi Config"
 
     config ESP_WIFI_SSID
         string "WiFi SSID"

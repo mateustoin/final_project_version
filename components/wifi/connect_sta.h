@@ -16,11 +16,12 @@
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "esp_event.h"
+#include "esp_check.h"
 #include "nvs_flash.h"
 #include "esp_log.h"
 
-#include "lwip/err.h"
-#include "lwip/sys.h"
+// #include "lwip/err.h"
+// #include "lwip/sys.h"
 
 /* The examples use WiFi configuration that you can set via project configuration menu
    If you'd rather not, just change the below entries to strings with
@@ -51,6 +52,7 @@
 void event_handler(void* arg, esp_event_base_t event_base,
                                 int32_t event_id, void* event_data);
 void wifi_init_sta(void);
+esp_err_t wifi_config_sta(void);
 void wifi_disconnect(void);
 
 #endif
