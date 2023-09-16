@@ -128,23 +128,23 @@ void runProjectFsm()
                 eNextState = IDLE_STATE;
                 break;
             }
-            eNextState = INIT_MPU6886_STATE;
-        break;
-        case INIT_MPU6886_STATE:
-            ESP_LOGI(TAG, "Entering INIT_MPU6886_STATE");
             eNextState = INIT_GPIO_STATE;
-        break;
+            break;
         case INIT_GPIO_STATE:
             ESP_LOGI(TAG, "Entering INIT_GPIO_STATE");
             init_gpio_button_config();
+            eNextState = INIT_MPU6886_STATE;
+            break;
+        case INIT_MPU6886_STATE:
+            ESP_LOGI(TAG, "Entering INIT_MPU6886_STATE");
             eNextState = WAIT_FOR_START_STATE;
-        break;
+            break;
         case WAIT_FOR_START_STATE:
             ESP_LOGI(TAG, "Entering WAIT_FOR_START_STATE");
-        break;
+            break;
         case INIT_SUPABASE_CONN_STATE:
             ESP_LOGI(TAG, "Entering INIT_SUPABASE_CONN_STATE");
-        break;
+            break;
         case INIT_SAC_DM_ROUTINE_STATE:
             ESP_LOGI(TAG, "Entering INIT_SAC_DM_ROUTINE_STATE");
             break;
