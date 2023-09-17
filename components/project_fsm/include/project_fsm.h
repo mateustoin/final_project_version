@@ -43,6 +43,9 @@ eSystemState InsertCardHandler();
 void runFsm();
 void runProjectFsm();
 
+void fsm_set_current_state(project_states_t newState);
+void fsm_set_next_state(project_states_t newState);
+project_states_t fsm_get_current_state();
 eSystemEvent ReadEvent();
 
 void setSystemEvent(eSystemEvent evt);
