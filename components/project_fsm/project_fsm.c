@@ -14,6 +14,7 @@
 // Bibliotecas do projeto
 #include "connect_sta.h"
 #include "gpio_button.h"
+#include "sacdm_acc_provider.h"
 
 static const char *TAG = "Project_FSM";
 project_states_t currentFsmState;
@@ -38,11 +39,10 @@ void fsm_set_next_state(project_states_t newState)
 void runProjectFsm()
 {
     eNextState = INIT_GPIO_STATE;
-    
+
     while(true) {
         esp_err_t ret_code;
-        //Read system Events
-        // eNewEvent = ReadEvent();
+
         switch(eNextState) {
         case INIT_GPIO_STATE:
             ESP_LOGI(TAG, "Starting INIT_GPIO_STATE");
@@ -69,7 +69,12 @@ void runProjectFsm()
         case INIT_MPU6886_STATE:
             ESP_LOGI(TAG, "Starting INIT_MPU6886_STATE");
             currentFsmState = INIT_MPU6886_STATE;
-            // Code...
+            ret_code = sacdm_mpu6886_init();
+            if (ret_code != ESP_OK) {
+                ESP_LOGE(TAG, "Failed to init MPU6886!");
+                eNextState = IDLE_STATE;
+                break;
+            }
             eNextState = WAIT_FOR_START_STATE;
             break;
         case WAIT_FOR_START_STATE:

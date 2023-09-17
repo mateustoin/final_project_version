@@ -16,6 +16,15 @@ void sacdm_acc_provider_init(void)
     raw.accZ = 0;
 }
 
+esp_err_t sacdm_mpu6886_init(void)
+{
+    ESP_LOGI(TAG, "MPU6886 initialization...");
+    raw.accX = 0;
+    raw.accY = 0;
+    raw.accZ = 0;
+    return mpu6886_init(&port);
+}
+
 void sacdm_acc_provider_read(raw_acc_val* acc_val)
 {
     // Atualiza dados da MPU em cada variável de aceleração
