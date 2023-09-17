@@ -46,7 +46,7 @@ void runProjectFsm()
 
         switch(eNextState) {
         case INIT_GPIO_STATE:
-            ESP_LOGI(TAG, "Starting INIT_GPIO_STATE");
+            ESP_LOGI(TAG, ">>> Starting INIT_GPIO_STATE <<<");
             currentFsmState = INIT_GPIO_STATE;
             ret_code = init_gpio_main_button_config();
             if (ret_code != ESP_OK) {
@@ -57,7 +57,7 @@ void runProjectFsm()
             eNextState = INIT_WIFI_STATE;
             break;
         case INIT_WIFI_STATE:
-            ESP_LOGI(TAG, "Starting INIT_WIFI_STATE");
+            ESP_LOGI(TAG, ">>> Starting INIT_WIFI_STATE <<<");
             currentFsmState = INIT_GPIO_STATE;
             ret_code = wifi_config_sta();
             if (ret_code != ESP_OK) {
@@ -68,7 +68,7 @@ void runProjectFsm()
             eNextState = INIT_MPU6886_STATE;
             break;
         case INIT_MPU6886_STATE:
-            ESP_LOGI(TAG, "Starting INIT_MPU6886_STATE");
+            ESP_LOGI(TAG, ">>> Starting INIT_MPU6886_STATE <<<");
             currentFsmState = INIT_MPU6886_STATE;
             ret_code = sacdm_mpu6886_init();
             if (ret_code != ESP_OK) {
@@ -79,12 +79,12 @@ void runProjectFsm()
             eNextState = WAIT_FOR_START_STATE;
             break;
         case WAIT_FOR_START_STATE:
-            ESP_LOGI(TAG, "Starting WAIT_FOR_START_STATE");
+            ESP_LOGI(TAG, ">>> Starting WAIT_FOR_START_STATE <<<");
             currentFsmState = WAIT_FOR_START_STATE;
             // Code...
             break;
         case INIT_SUPABASE_CONN_STATE:
-            ESP_LOGI(TAG, "Starting INIT_SUPABASE_CONN_STATE");
+            ESP_LOGI(TAG, ">>> Starting INIT_SUPABASE_CONN_STATE <<<");
             currentFsmState = INIT_SUPABASE_CONN_STATE;
             ret_code = spb_init_config();
             if (ret_code != ESP_OK) {
@@ -101,25 +101,25 @@ void runProjectFsm()
             eNextState = INIT_SAC_DM_ROUTINE_STATE;
             break;
         case INIT_SAC_DM_ROUTINE_STATE:
-            ESP_LOGI(TAG, "Starting INIT_SAC_DM_ROUTINE_STATE");
+            ESP_LOGI(TAG, ">>> Starting INIT_SAC_DM_ROUTINE_STATE <<<");
             currentFsmState = INIT_SAC_DM_ROUTINE_STATE;
             // Code...
             eNextState = EXIT_SUPABASE_CONN_STATE;
             break;
         case SAC_DM_DATA_COLLECTING_STATE:
-            ESP_LOGI(TAG, "Starting SAC_DM_DATA_COLLECTING_STATE");
+            ESP_LOGI(TAG, ">>> Starting SAC_DM_DATA_COLLECTING_STATE <<<");
             currentFsmState = SAC_DM_DATA_COLLECTING_STATE;
             // Code...
             eNextState = SEND_DATA_TO_SUPABASE_STATE;
             break;
         case SEND_DATA_TO_SUPABASE_STATE:
-            ESP_LOGI(TAG, "Starting SEND_DATA_TO_SUPABASE_STATE");
+            ESP_LOGI(TAG, ">>> Starting SEND_DATA_TO_SUPABASE_STATE <<<");
             currentFsmState = SEND_DATA_TO_SUPABASE_STATE;
             // Code...
             eNextState = EXIT_SUPABASE_CONN_STATE;
             break;
         case EXIT_SUPABASE_CONN_STATE:
-            ESP_LOGI(TAG, "Starting EXIT_SUPABASE_CONN_STATE");
+            ESP_LOGI(TAG, ">>> Starting EXIT_SUPABASE_CONN_STATE <<<");
             currentFsmState = EXIT_SUPABASE_CONN_STATE;
             ret_code = spb_close_connection();
             if (ret_code != ESP_OK) {
@@ -130,7 +130,7 @@ void runProjectFsm()
             eNextState = WAIT_FOR_START_STATE;
             break;
         case IDLE_STATE:
-            ESP_LOGI(TAG, "Starting IDLE_STATE");
+            ESP_LOGI(TAG, ">>> Starting IDLE_STATE <<<");
             currentFsmState = IDLE_STATE;
             // Code...
             break;
