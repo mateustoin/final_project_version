@@ -14,6 +14,7 @@
 // Bibliotecas do projeto
 #include "connect_sta.h"
 #include "gpio_button.h"
+#include "supabase_client.h"
 #include "sacdm_acc_provider.h"
 
 static const char *TAG = "Project_FSM";
@@ -85,14 +86,25 @@ void runProjectFsm()
         case INIT_SUPABASE_CONN_STATE:
             ESP_LOGI(TAG, "Starting INIT_SUPABASE_CONN_STATE");
             currentFsmState = INIT_SUPABASE_CONN_STATE;
-            // Code...
+            ret_code = spb_init_config();
+            if (ret_code != ESP_OK) {
+                ESP_LOGE(TAG, "Failed to config supabase https client!");
+                eNextState = WAIT_FOR_START_STATE;
+                break;
+            }
+            ret_code = spb_start_connection();
+            if (ret_code != ESP_OK) {
+                ESP_LOGE(TAG, "Failed to start supabase https client data send!");
+                eNextState = WAIT_FOR_START_STATE;
+                break;
+            }
             eNextState = INIT_SAC_DM_ROUTINE_STATE;
             break;
         case INIT_SAC_DM_ROUTINE_STATE:
             ESP_LOGI(TAG, "Starting INIT_SAC_DM_ROUTINE_STATE");
             currentFsmState = INIT_SAC_DM_ROUTINE_STATE;
             // Code...
-            eNextState = SAC_DM_DATA_COLLECTING_STATE;
+            eNextState = EXIT_SUPABASE_CONN_STATE;
             break;
         case SAC_DM_DATA_COLLECTING_STATE:
             ESP_LOGI(TAG, "Starting SAC_DM_DATA_COLLECTING_STATE");
@@ -109,8 +121,13 @@ void runProjectFsm()
         case EXIT_SUPABASE_CONN_STATE:
             ESP_LOGI(TAG, "Starting EXIT_SUPABASE_CONN_STATE");
             currentFsmState = EXIT_SUPABASE_CONN_STATE;
-            // Code...
-            eNextState = IDLE_STATE;
+            ret_code = spb_close_connection();
+            if (ret_code != ESP_OK) {
+                ESP_LOGE(TAG, "Failed to close client connection with supabase!");
+                eNextState = IDLE_STATE;
+                break;
+            }
+            eNextState = WAIT_FOR_START_STATE;
             break;
         case IDLE_STATE:
             ESP_LOGI(TAG, "Starting IDLE_STATE");

@@ -1,0 +1,13 @@
+menu "Project Supabase Config"
+
+    config TABLE_URL
+        string "Table URL"
+        help
+            Link to table URL from database.
+
+    config API_KEY
+        string "API Key"
+        help
+            API Key to access and perform operations on a specific database table
+
+endmenu

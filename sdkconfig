@@ -346,6 +346,13 @@ CONFIG_BUTTON_B=39
 # end of Project GPIO Config
 
 #
+# Project Supabase Config
+#
+CONFIG_TABLE_URL="https://nuopbiwoomjqqfgdasxh.supabase.co/rest/v1/Teste2?"
+CONFIG_API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51b3BiaXdvb21qcXFmZ2Rhc3hoIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTM3ODE5NzYsImV4cCI6MTk2OTM1Nzk3Nn0.OhT45KrI62zmA8TVxabm1dfeuyZhLD2O7tPp6NMXD2s"
+# end of Project Supabase Config
+
+#
 # Project WiFi Config
 #
 CONFIG_ESP_WIFI_SSID="ESPTest"

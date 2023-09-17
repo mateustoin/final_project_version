@@ -17,3 +17,8 @@ void spb_close(void);
 void spb_read(void);
 void spb_write(void *data);
 // void spb_change_config(void *config_data);
+
+esp_err_t spb_init_config(void);
+esp_err_t spb_start_connection(void);
+esp_err_t spb_close_connection(void);
+esp_err_t spb_write_sacdm_data(void);
