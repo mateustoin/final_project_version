@@ -53,6 +53,10 @@ void set_button_main_mode(main_button_mode_t mode)
 
 static void main_button_single_click_cb()
 {
+    // If button is being called after a fail scenario,
+    // it should reset the board? Something to think...
+    // Maybe this treatment can be done here and we don't need
+    // main_button_mode_t to handle every possibility
     switch(fsm_get_current_state()) {
         case INIT_GPIO_STATE:
             ESP_LOGI(TAG, "Button clicked while starting gpio. Is that even possible?! Nothing to do.");
