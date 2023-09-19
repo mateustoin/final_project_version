@@ -5,8 +5,3 @@ void func(void)
 {
 
 }
-
-void gpio_manager_config()
-{
-
-}

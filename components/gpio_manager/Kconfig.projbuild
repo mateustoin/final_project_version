@@ -12,6 +12,12 @@ menu "Project GPIO Config"
         help
             Side button to perform project/application secondary actions
 
+    config LED
+        int "Led status"
+        default 10
+        help
+            Status led indicator for states
+
     # config ESP_WIFI_SSID
     #     string "WiFi SSID"
     #     default "ESPTest"

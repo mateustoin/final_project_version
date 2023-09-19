@@ -4,4 +4,3 @@
 #include "gpio_led.h"
 
 void func(void);
-void gpio_config();
