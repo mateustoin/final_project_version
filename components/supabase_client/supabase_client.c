@@ -118,7 +118,16 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt)
 esp_err_t spb_init_config(void)
 {
     ESP_LOGI(TAG, "Inicializando Supabase (HTTPS) Client");
-    
+
+    if (!strcmp(CONFIG_TABLE_URL, "")) {
+        ESP_LOGE(TAG, "Need Supabase TABLE_URL in menuconfig to start");
+        return ESP_FAIL;
+    }
+    if (!strcmp(CONFIG_API_KEY, "")) {
+        ESP_LOGE(TAG, "Need Supabase API_KEY in menuconfig to start");
+        return ESP_FAIL;
+    }
+
     char local_response_buffer[MAX_HTTP_OUTPUT_BUFFER + 1] = {0};
     esp_http_client_config_t esp_http_client_config = {
         .url = "https://nuopbiwoomjqqfgdasxh.supabase.co",
