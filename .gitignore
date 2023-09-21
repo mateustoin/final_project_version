@@ -1,3 +1,5 @@
 build/
 **.crt
 .vscode/
+sdkconfig
+sdkconfig.old

@@ -1,0 +1,8 @@
+# This file was generated using idf.py save-defconfig. It can be edited manually.
+# Espressif IoT Development Framework (ESP-IDF)  Project Minimal Configuration
+#
+CONFIG_ESP_TLS_INSECURE=y
+CONFIG_ESP_TLS_SKIP_SERVER_CERT_VERIFY=y
+CONFIG_I2C_MANAGER_0_ENABLED=y
+CONFIG_I2C_MANAGER_0_SDA=21
+CONFIG_I2C_MANAGER_0_SCL=22
