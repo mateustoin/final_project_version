@@ -72,7 +72,7 @@ static void main_button_single_click_cb()
             fsm_set_next_state(INIT_SUPABASE_CONN_STATE);
             break;
         case INIT_SUPABASE_CONN_STATE:
-            ESP_LOGI(TAG, "Bla button supabase_conn");
+            ESP_LOGI(TAG, "Doing nothing while initializing connection with Supabase.");
             break;
         case INIT_SAC_DM_ROUTINE_STATE:
             ESP_LOGI(TAG, "Bla button supabase_routine");

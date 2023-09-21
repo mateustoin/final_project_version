@@ -33,7 +33,7 @@ typedef enum {
     Amount_Dispatch_Event
 } eSystemEvent;
 
-void runProjectFsm();
+void run_project_fsm();
 
 void fsm_set_current_state(project_states_t newState);
 void fsm_set_next_state(project_states_t newState);

@@ -20,6 +20,7 @@
 #include "sacdm_manager.h"
 
 static const char *TAG = "Project_FSM";
+
 project_states_t currentFsmState;
 project_states_t eNextState;
 eSystemEvent currentEvt;
@@ -39,7 +40,7 @@ void fsm_set_next_state(project_states_t newState)
     eNextState = newState;
 }
 
-void runProjectFsm()
+void run_project_fsm()
 {
     eNextState = INIT_GPIO_STATE;
 
@@ -116,7 +117,9 @@ void runProjectFsm()
         case INIT_SAC_DM_ROUTINE_STATE:
             ESP_LOGI(TAG, ">>> Starting INIT_SAC_DM_ROUTINE_STATE <<<");
             currentFsmState = INIT_SAC_DM_ROUTINE_STATE;
-            init_sacdm_routine_periodic_timer();
+            ret_code = init_sacdm_routine_periodic_timer();
+            if (ret_code != ESP_OK)
+                eNextState = WAIT_FOR_START_STATE;
             eNextState = SAC_DM_DATA_COLLECTING_STATE;
             break;
         case SAC_DM_DATA_COLLECTING_STATE:
@@ -130,7 +133,7 @@ void runProjectFsm()
         case SEND_DATA_TO_SUPABASE_STATE:
             ESP_LOGI(TAG, ">>> Starting SEND_DATA_TO_SUPABASE_STATE <<<");
             currentFsmState = SEND_DATA_TO_SUPABASE_STATE;
-            spb_write_sacdm_data(create_sacdm_payload_body());
+            ret_code = spb_write_sacdm_data(create_sacdm_payload_body());
             set_sacdm_data_state(NOT_READY_DATA);
             eNextState = SAC_DM_DATA_COLLECTING_STATE;
             break;
@@ -143,7 +146,11 @@ void runProjectFsm()
                 eNextState = IDLE_STATE;
                 break;
             }
-            sacdm_reset();
+            ret_code = sacdm_reset();
+            if (ret_code != ESP_OK) {
+                eNextState = IDLE_STATE;
+                break;
+            }
             update_led_event_mode(SUCCESS_EVENT);
             eNextState = WAIT_FOR_START_STATE;
             break;
@@ -154,7 +161,8 @@ void runProjectFsm()
             // Code...
             break;
         default:
-            ESP_LOGI(TAG, "Starting default state");
+            ESP_LOGI(TAG, "Starting default state. Wrong event sent!");
+            eNextState = IDLE_STATE;
             break;
         }
         vTaskDelay(10);

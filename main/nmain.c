@@ -6,5 +6,5 @@
 
 void app_main(void)
 {
-    runProjectFsm();
+    run_project_fsm();
 }

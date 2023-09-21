@@ -144,12 +144,6 @@ void spb_open(supabase_config *config_info)
 void spb_init(void)
 {
     ESP_LOGI(TAG, "Inicializando Supabase (HTTP) Client");
-    // strcat(auth, config.api_key);
-    // client = esp_http_client_init(&esp_http_client_config);
-    // esp_http_client_set_header(client, "Content-Type", "application/json");
-    // esp_http_client_set_header(client, "Prefer", "return=representation");
-    // esp_http_client_set_header(client, "apikey", config.api_key);
-    // esp_http_client_set_header(client, "Authorization", auth);
 }
 
 void spb_close(void)
@@ -175,21 +169,6 @@ void spb_write(void *data)
         ESP_LOGE(TAG, "POST request failed: %s", esp_err_to_name(err));
     }
 }
-
-// esp_err_t on_client_data(esp_http_client_event_t *evt)
-// {
-//     switch(evt->event_id) {
-//         // Quando chega dados
-//         case HTTP_EVENT_ON_DATA:
-//             // ESP_LOGI(TAG, "Length=%d", evt->data_len);
-//             // printf("%.*s\n", evt->data_len, (char *)evt->data);
-//             break;
-//         default:
-//             break;
-//     }
-
-//     return ESP_OK;
-// }
 
 void fetch_data(void)
 {

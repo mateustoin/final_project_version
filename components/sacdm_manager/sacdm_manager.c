@@ -11,6 +11,8 @@
 
 #include "supabase_client.h"
 
+static const char *TAG = "sacdm_manager";
+
 /*
     ************************************
     Definição de variáveis para o SAC-DM
@@ -60,10 +62,10 @@ void sacdm_init(TaskHandle_t *notify_handler)
     sacdm_acc_provider_init();
 }
 
-void sacdm_reset(void)
+esp_err_t sacdm_reset(void)
 {
-    esp_timer_stop(periodic_timer);
-    esp_timer_delete(periodic_timer);
+    ESP_LOGI(TAG, "Reseting timer and sac-dm values...");
+    esp_err_t ret;
     value = 0; 
     readings = 0; 
     peaks_x = 0; 
@@ -73,6 +75,18 @@ void sacdm_reset(void)
     rho_y = 0.0;
     rho_z = 0.0;
     current_data_state = NOT_READY_DATA;
+    ret = esp_timer_stop(periodic_timer);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Error stoping sac-dm timer!");
+        return ESP_FAIL;
+    }
+    ret = esp_timer_delete(periodic_timer);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Error deleting sac-dm timer!");
+        return ESP_FAIL;
+    }
+
+    return ESP_OK;
 }
 
 void sacdm_calculate()
@@ -150,13 +164,24 @@ void sacdm_periodic_calculate()
     }
 }
 
-void init_sacdm_routine_periodic_timer()
+esp_err_t init_sacdm_routine_periodic_timer()
 {
-    esp_timer_create(&esp_timer_create_args, &periodic_timer);
+    ESP_LOGI(TAG, "Creating and starting sac-dm periodic data collect timer.");
+    esp_err_t ret;
+    ret = esp_timer_create(&esp_timer_create_args, &periodic_timer);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Error creating sac-dm timer!");
+        return ESP_FAIL;
+    }
     current_data_state = NOT_READY_DATA;
+    // ret = esp_timer_start_periodic(periodic_timer, 2000);
+    ret = esp_timer_start_periodic(periodic_timer, (1.0/(float)CONFIG_SACDM_SAMPLE_SIZE)*1000000);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Error starting sac-dm timer!");
+        return ESP_FAIL;
+    }
 
-    if (!esp_timer_is_active(periodic_timer))
-        esp_timer_start_periodic(periodic_timer, 2000);
+    return ESP_OK;
 }
 
 void set_sacdm_data_state(sacdm_data_state_t dState)
