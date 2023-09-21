@@ -9,8 +9,6 @@
 // Tratamento de JSON
 #include "cJSON.h"
 
-#include "supabase_client.h"
-
 static const char *TAG = "sacdm_manager";
 
 /*
@@ -112,7 +110,6 @@ void sacdm_periodic_calculate()
         rho_y = (float)peaks_y / (float)CONFIG_SACDM_SAMPLE_SIZE;
         rho_z = (float)peaks_z / (float)CONFIG_SACDM_SAMPLE_SIZE;
         ESP_LOGE("sacdm_manager", "rho_x: %f, rho_y: %f, rho_z: %f", rho_x, rho_y, rho_z);
-        // spb_write_sacdm_data(create_sacdm_payload_body());
         readings = 1;
         peaks_x = 0;
         peaks_y = 0;
@@ -131,7 +128,6 @@ esp_err_t init_sacdm_routine_periodic_timer()
         return ESP_FAIL;
     }
     current_data_state = NOT_READY_DATA;
-    // ret = esp_timer_start_periodic(periodic_timer, 2000);
     ret = esp_timer_start_periodic(periodic_timer, (1.0/(float)CONFIG_SACDM_SAMPLE_SIZE)*1000000);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Error starting sac-dm timer!");
