@@ -5,7 +5,6 @@
 #include "esp_system.h"
 #include "esp_log.h"
 #include "esp_err.h"
-#include "esp_timer.h"
 #include "sdkconfig.h"
 
 // Bibliotecas do freeRTOS
@@ -25,13 +24,6 @@ project_states_t currentFsmState;
 project_states_t eNextState;
 eSystemEvent currentEvt;
 
-const esp_timer_create_args_t periodic_timer_args = {
-    .callback = &sacdm_periodic_calculate,
-    /* name is optional, but may help identify the timer when debugging */
-    .name = "periodic"
-};
-esp_timer_handle_t periodic_timer;
-
 project_states_t fsm_get_current_state()
 {
     return currentFsmState;
@@ -50,7 +42,6 @@ void fsm_set_next_state(project_states_t newState)
 void runProjectFsm()
 {
     eNextState = INIT_GPIO_STATE;
-    esp_timer_create(&periodic_timer_args, &periodic_timer);
 
     while(true) {
         esp_err_t ret_code;
@@ -125,22 +116,23 @@ void runProjectFsm()
         case INIT_SAC_DM_ROUTINE_STATE:
             ESP_LOGI(TAG, ">>> Starting INIT_SAC_DM_ROUTINE_STATE <<<");
             currentFsmState = INIT_SAC_DM_ROUTINE_STATE;
-            if (!esp_timer_is_active(periodic_timer))
-                esp_timer_start_periodic(periodic_timer, 2000);
-            // Code...
-            eNextState = IDLE_STATE;
+            init_sacdm_routine_periodic_timer();
+            eNextState = SAC_DM_DATA_COLLECTING_STATE;
             break;
-        // case SAC_DM_DATA_COLLECTING_STATE:
-        //     ESP_LOGI(TAG, ">>> Starting SAC_DM_DATA_COLLECTING_STATE <<<");
-        //     currentFsmState = SAC_DM_DATA_COLLECTING_STATE;
-        //     // Code...
-        //     eNextState = SEND_DATA_TO_SUPABASE_STATE;
-        //     break;
+        case SAC_DM_DATA_COLLECTING_STATE:
+            ESP_LOGI(TAG, ">>> Starting SAC_DM_DATA_COLLECTING_STATE <<<");
+            currentFsmState = SAC_DM_DATA_COLLECTING_STATE;
+            if (get_sacdm_data_state() == READY_DATA) {
+                eNextState = SEND_DATA_TO_SUPABASE_STATE;
+            }
+            // OTHER CONDITIONS TO LEAVE COLLECTING STATE
+            break;
         case SEND_DATA_TO_SUPABASE_STATE:
             ESP_LOGI(TAG, ">>> Starting SEND_DATA_TO_SUPABASE_STATE <<<");
             currentFsmState = SEND_DATA_TO_SUPABASE_STATE;
-            // Code...
-            eNextState = EXIT_SUPABASE_CONN_STATE;
+            spb_write_sacdm_data(create_sacdm_payload_body());
+            set_sacdm_data_state(NOT_READY_DATA);
+            eNextState = SAC_DM_DATA_COLLECTING_STATE;
             break;
         case EXIT_SUPABASE_CONN_STATE:
             ESP_LOGI(TAG, ">>> Starting EXIT_SUPABASE_CONN_STATE <<<");
@@ -151,6 +143,7 @@ void runProjectFsm()
                 eNextState = IDLE_STATE;
                 break;
             }
+            sacdm_reset();
             update_led_event_mode(SUCCESS_EVENT);
             eNextState = WAIT_FOR_START_STATE;
             break;

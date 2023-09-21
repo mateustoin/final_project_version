@@ -79,6 +79,7 @@ static void main_button_single_click_cb()
             break;
         case SAC_DM_DATA_COLLECTING_STATE:
             ESP_LOGI(TAG, "Bla button sacdm_collecting");
+            fsm_set_next_state(EXIT_SUPABASE_CONN_STATE);
             break;
         case SEND_DATA_TO_SUPABASE_STATE:
             ESP_LOGI(TAG, "Bla button supabase_send_data");

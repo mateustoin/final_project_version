@@ -34,12 +34,14 @@ static raw_acc_val raw_val = {
 
 TaskHandle_t *sacdm_notification_emitter;
 
+sacdm_data_state_t current_data_state;
+
 // Create timer config
 const esp_timer_create_args_t esp_timer_create_args = {
-        .callback = sacdm_calculate,
+        .callback = &sacdm_periodic_calculate,
         .name = "SAC-DM Timer"
 };
-esp_timer_handle_t esp_timer_handle;
+esp_timer_handle_t periodic_timer;
 
 char *create_sacdm_payload_body(void)
 {
@@ -60,6 +62,8 @@ void sacdm_init(TaskHandle_t *notify_handler)
 
 void sacdm_reset(void)
 {
+    esp_timer_stop(periodic_timer);
+    esp_timer_delete(periodic_timer);
     value = 0; 
     readings = 0; 
     peaks_x = 0; 
@@ -68,6 +72,7 @@ void sacdm_reset(void)
     rho_x = 0.0;
     rho_y = 0.0;
     rho_z = 0.0;
+    current_data_state = NOT_READY_DATA;
 }
 
 void sacdm_calculate()
@@ -136,11 +141,30 @@ void sacdm_periodic_calculate()
         rho_y = (float)peaks_y / (float)CONFIG_SACDM_SAMPLE_SIZE;
         rho_z = (float)peaks_z / (float)CONFIG_SACDM_SAMPLE_SIZE;
         ESP_LOGE("sacdm_manager", "rho_x: %f, rho_y: %f, rho_z: %f", rho_x, rho_y, rho_z);
-        // xTaskNotifyGive(*sacdm_notification_emitter);
-        spb_write_sacdm_data(create_sacdm_payload_body());
+        // spb_write_sacdm_data(create_sacdm_payload_body());
         readings = 1;
         peaks_x = 0;
         peaks_y = 0;
         peaks_z = 0;
+        set_sacdm_data_state(READY_DATA);
     }
+}
+
+void init_sacdm_routine_periodic_timer()
+{
+    esp_timer_create(&esp_timer_create_args, &periodic_timer);
+    current_data_state = NOT_READY_DATA;
+
+    if (!esp_timer_is_active(periodic_timer))
+        esp_timer_start_periodic(periodic_timer, 2000);
+}
+
+void set_sacdm_data_state(sacdm_data_state_t dState)
+{
+    current_data_state = dState;
+}
+
+sacdm_data_state_t get_sacdm_data_state()
+{
+    return current_data_state;
 }
