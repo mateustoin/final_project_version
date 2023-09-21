@@ -2,6 +2,7 @@
 #include "iot_button.h"
 #include "project_fsm.h"
 #include "esp_log.h"
+#include "esp_system.h"
 
 static const char *TAG = "gpio_button";
 
@@ -53,10 +54,6 @@ void set_button_main_mode(main_button_mode_t mode)
 
 static void main_button_single_click_cb()
 {
-    // If button is being called after a fail scenario,
-    // it should reset the board? Something to think...
-    // Maybe this treatment can be done here and we don't need
-    // main_button_mode_t to handle every possibility
     switch(fsm_get_current_state()) {
         case INIT_GPIO_STATE:
             ESP_LOGI(TAG, "Button clicked while starting gpio. Is that even possible?! Nothing to do.");
@@ -75,23 +72,27 @@ static void main_button_single_click_cb()
             ESP_LOGI(TAG, "Doing nothing while initializing connection with Supabase.");
             break;
         case INIT_SAC_DM_ROUTINE_STATE:
-            ESP_LOGI(TAG, "Bla button supabase_routine");
+            ESP_LOGI(TAG, "Cancelling state, cleaning data and going back to WAIT_FOR_START_STATE");
+            fsm_set_next_state(EXIT_SUPABASE_CONN_STATE);
             break;
         case SAC_DM_DATA_COLLECTING_STATE:
-            ESP_LOGI(TAG, "Bla button sacdm_collecting");
+            ESP_LOGI(TAG, "Cancelling state, cleaning data and going back to WAIT_FOR_START_STATE");
             fsm_set_next_state(EXIT_SUPABASE_CONN_STATE);
             break;
         case SEND_DATA_TO_SUPABASE_STATE:
-            ESP_LOGI(TAG, "Bla button supabase_send_data");
+            ESP_LOGI(TAG, "Cancelling state, cleaning data and going back to WAIT_FOR_START_STATE");
+            fsm_set_next_state(EXIT_SUPABASE_CONN_STATE);
             break;
         case EXIT_SUPABASE_CONN_STATE:
-            ESP_LOGI(TAG, "Bla button supabase_exit_conn");
+            ESP_LOGI(TAG, "Already cleaning data and going back to WAIT_FOR_START_STATE");
             break;
         case IDLE_STATE:
-            ESP_LOGI(TAG, "Bla button idle_state, you are stuck!");
+            ESP_LOGI(TAG, "Leaving IDLE_STATE and restarting the board.");
+            esp_restart();
             break;
         default:
-            ESP_LOGI(TAG, "Starting default state");
+            ESP_LOGI(TAG, "Starting default state, not recognized... going to IDLE_STATE");
+            fsm_set_next_state(IDLE_STATE);
             break;
     }
 }
