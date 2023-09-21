@@ -97,7 +97,6 @@ void run_project_fsm()
                 ESP_LOGI(TAG, ">>> Starting WAIT_FOR_START_STATE <<<");
             currentFsmState = WAIT_FOR_START_STATE;
             update_led_event_mode(WAIT_FOR_START_EVENT);
-            // Code...
             break;
         case INIT_SUPABASE_CONN_STATE:
             if (eNextState != currentFsmState)
@@ -135,7 +134,6 @@ void run_project_fsm()
             if (get_sacdm_data_state() == READY_DATA) {
                 eNextState = SEND_DATA_TO_SUPABASE_STATE;
             }
-            // OTHER CONDITIONS TO LEAVE COLLECTING STATE
             break;
         case SEND_DATA_TO_SUPABASE_STATE:
             if (eNextState != currentFsmState)
@@ -168,13 +166,12 @@ void run_project_fsm()
                 ESP_LOGI(TAG, ">>> Starting IDLE_STATE <<<");
             currentFsmState = IDLE_STATE;
             update_led_event_mode(IDLE_LED_STATE);
-            // Code...
             break;
         default:
             ESP_LOGI(TAG, "Starting default state. Wrong event sent!");
             eNextState = IDLE_STATE;
             break;
         }
-        vTaskDelay(10);
+        vTaskDelay(5);
     }
 }

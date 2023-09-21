@@ -34,7 +34,6 @@ typedef enum {
 } eSystemEvent;
 
 void run_project_fsm();
-
 void fsm_set_current_state(project_states_t newState);
 void fsm_set_next_state(project_states_t newState);
 project_states_t fsm_get_current_state();

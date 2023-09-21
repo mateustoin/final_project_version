@@ -9,9 +9,7 @@ typedef enum {
     READY_DATA
 } sacdm_data_state_t;
 
-void sacdm_init(TaskHandle_t *notify_handler);
 esp_err_t sacdm_reset(void);
-void sacdm_calculate();
 char *create_sacdm_payload_body(void);
 
 esp_err_t init_sacdm_routine_periodic_timer();
