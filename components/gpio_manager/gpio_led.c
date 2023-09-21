@@ -51,7 +51,7 @@ const blink_step_t idle_led_behavior[] = {
     INVALID_EVENT - Fade led constantly between 0 and half bright
 */
 const blink_step_t invalid_led_behavior[] = {
-    {LED_BLINK_BREATHE, LED_STATE_OFF, 50},             // step2: fade from on to off 500ms
+    {LED_BLINK_BREATHE, LED_STATE_OFF, 100},             // step2: fade from on to off 500ms
     {LED_BLINK_LOOP, 0, 0},                              // step4: stop blink (50% brightness)
 };
 

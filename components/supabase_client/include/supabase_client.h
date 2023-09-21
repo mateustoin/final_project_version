@@ -21,4 +21,4 @@ void spb_write(void *data);
 esp_err_t spb_init_config(void);
 esp_err_t spb_start_connection(void);
 esp_err_t spb_close_connection(void);
-esp_err_t spb_write_sacdm_data(void);
+esp_err_t spb_write_sacdm_data(void *data);

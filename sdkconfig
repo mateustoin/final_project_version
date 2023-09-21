@@ -347,6 +347,12 @@ CONFIG_LED=10
 # end of Project GPIO Config
 
 #
+# Project SACDM Config
+#
+CONFIG_SACDM_SAMPLE_SIZE=500
+# end of Project SACDM Config
+
+#
 # Project Supabase Config
 #
 CONFIG_TABLE_URL="https://nuopbiwoomjqqfgdasxh.supabase.co/rest/v1/Teste2?"

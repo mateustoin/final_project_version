@@ -4,9 +4,12 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include <esp_log.h>
+#include "esp_timer.h"
 
 // Tratamento de JSON
 #include "cJSON.h"
+
+#include "supabase_client.h"
 
 /*
     ************************************
@@ -30,6 +33,13 @@ static raw_acc_val raw_val = {
 };
 
 TaskHandle_t *sacdm_notification_emitter;
+
+// Create timer config
+const esp_timer_create_args_t esp_timer_create_args = {
+        .callback = sacdm_calculate,
+        .name = "SAC-DM Timer"
+};
+esp_timer_handle_t esp_timer_handle;
 
 char *create_sacdm_payload_body(void)
 {
@@ -88,8 +98,46 @@ void sacdm_calculate()
         rho_x = (float)peaks_x / (float)SAMPLE_SIZE;
         rho_y = (float)peaks_y / (float)SAMPLE_SIZE;
         rho_z = (float)peaks_z / (float)SAMPLE_SIZE;
-        ESP_LOGI("sacdm_manager", "rho_x: %f, rho_y: %f, rho_z: %f", rho_x, rho_y, rho_z);
+        ESP_LOGD("sacdm_manager", "rho_x: %f, rho_y: %f, rho_z: %f", rho_x, rho_y, rho_z);
         xTaskNotifyGive(*sacdm_notification_emitter);
+        readings = 1;
+        peaks_x = 0;
+        peaks_y = 0;
+        peaks_z = 0;
+    }
+}
+
+void sacdm_periodic_calculate()
+{
+    sacdm_acc_provider_read(&raw_val);
+
+    signals_x[0] = signals_x[1];
+    signals_x[1] = signals_x[2];
+    signals_x[2] = raw_val.accX;
+
+    signals_y[0] = signals_y[1];
+    signals_y[1] = signals_y[2];
+    signals_y[2] = raw_val.accY;
+
+    signals_z[0] = signals_z[1];
+    signals_z[1] = signals_z[2];
+    signals_z[2] = raw_val.accZ;
+
+    readings++;
+
+    if (readings > 2) {
+        if ((float)signals_x[1] > (float)signals_x[0]*threshold && (float)signals_x[1] > (float)signals_x[2]*threshold) peaks_x++;
+        if ((float)signals_y[1] > (float)signals_y[0]*threshold && (float)signals_y[1] > (float)signals_y[2]*threshold) peaks_y++;
+        if ((float)signals_z[1] > (float)signals_z[0]*threshold && (float)signals_z[1] > (float)signals_z[2]*threshold) peaks_z++;
+    }
+
+    if (readings == CONFIG_SACDM_SAMPLE_SIZE) {
+        rho_x = (float)peaks_x / (float)CONFIG_SACDM_SAMPLE_SIZE;
+        rho_y = (float)peaks_y / (float)CONFIG_SACDM_SAMPLE_SIZE;
+        rho_z = (float)peaks_z / (float)CONFIG_SACDM_SAMPLE_SIZE;
+        ESP_LOGE("sacdm_manager", "rho_x: %f, rho_y: %f, rho_z: %f", rho_x, rho_y, rho_z);
+        // xTaskNotifyGive(*sacdm_notification_emitter);
+        spb_write_sacdm_data(create_sacdm_payload_body());
         readings = 1;
         peaks_x = 0;
         peaks_y = 0;

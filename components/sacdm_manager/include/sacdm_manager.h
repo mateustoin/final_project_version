@@ -8,3 +8,5 @@ void sacdm_init(TaskHandle_t *notify_handler);
 void sacdm_reset(void);
 void sacdm_calculate();
 char *create_sacdm_payload_body(void);
+
+void sacdm_periodic_calculate();

@@ -5,6 +5,7 @@
 #include "esp_system.h"
 #include "esp_log.h"
 #include "esp_err.h"
+#include "esp_timer.h"
 #include "sdkconfig.h"
 
 // Bibliotecas do freeRTOS
@@ -17,11 +18,19 @@
 #include "gpio_led.h"
 #include "supabase_client.h"
 #include "sacdm_acc_provider.h"
+#include "sacdm_manager.h"
 
 static const char *TAG = "Project_FSM";
 project_states_t currentFsmState;
 project_states_t eNextState;
 eSystemEvent currentEvt;
+
+const esp_timer_create_args_t periodic_timer_args = {
+    .callback = &sacdm_periodic_calculate,
+    /* name is optional, but may help identify the timer when debugging */
+    .name = "periodic"
+};
+esp_timer_handle_t periodic_timer;
 
 project_states_t fsm_get_current_state()
 {
@@ -41,6 +50,7 @@ void fsm_set_next_state(project_states_t newState)
 void runProjectFsm()
 {
     eNextState = INIT_GPIO_STATE;
+    esp_timer_create(&periodic_timer_args, &periodic_timer);
 
     while(true) {
         esp_err_t ret_code;
@@ -115,15 +125,17 @@ void runProjectFsm()
         case INIT_SAC_DM_ROUTINE_STATE:
             ESP_LOGI(TAG, ">>> Starting INIT_SAC_DM_ROUTINE_STATE <<<");
             currentFsmState = INIT_SAC_DM_ROUTINE_STATE;
+            if (!esp_timer_is_active(periodic_timer))
+                esp_timer_start_periodic(periodic_timer, 2000);
             // Code...
-            eNextState = EXIT_SUPABASE_CONN_STATE;
+            eNextState = IDLE_STATE;
             break;
-        case SAC_DM_DATA_COLLECTING_STATE:
-            ESP_LOGI(TAG, ">>> Starting SAC_DM_DATA_COLLECTING_STATE <<<");
-            currentFsmState = SAC_DM_DATA_COLLECTING_STATE;
-            // Code...
-            eNextState = SEND_DATA_TO_SUPABASE_STATE;
-            break;
+        // case SAC_DM_DATA_COLLECTING_STATE:
+        //     ESP_LOGI(TAG, ">>> Starting SAC_DM_DATA_COLLECTING_STATE <<<");
+        //     currentFsmState = SAC_DM_DATA_COLLECTING_STATE;
+        //     // Code...
+        //     eNextState = SEND_DATA_TO_SUPABASE_STATE;
+        //     break;
         case SEND_DATA_TO_SUPABASE_STATE:
             ESP_LOGI(TAG, ">>> Starting SEND_DATA_TO_SUPABASE_STATE <<<");
             currentFsmState = SEND_DATA_TO_SUPABASE_STATE;
@@ -152,6 +164,6 @@ void runProjectFsm()
             ESP_LOGI(TAG, "Starting default state");
             break;
         }
-        vTaskDelay(100);
+        vTaskDelay(10);
     }
 }
